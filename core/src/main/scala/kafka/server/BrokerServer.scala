@@ -42,7 +42,7 @@ import org.apache.kafka.coordinator.share.metrics.{ShareCoordinatorMetrics, Shar
 import org.apache.kafka.coordinator.share.{ShareCoordinator, ShareCoordinatorRecordSerde, ShareCoordinatorService}
 import org.apache.kafka.coordinator.transaction.ProducerIdManager
 import org.apache.kafka.image.publisher.{BrokerRegistrationTracker, MetadataPublisher}
-import org.apache.kafka.metadata.{BrokerState, KRaftMetadataCache, ListenerInfo, MetadataCache, MetadataVersionConfigValidator}
+import org.apache.kafka.metadata.{BrokerState, KRaftMetadataCache, KafkaConfigSchema, ListenerInfo, MetadataCache, MetadataVersionConfigValidator}
 import org.apache.kafka.metadata.publisher.{AclPublisher, DelegationTokenPublisher, DynamicClientQuotaPublisher, DynamicTopicClusterQuotaPublisher, ScramPublisher}
 import org.apache.kafka.security.{CredentialProvider, DelegationTokenManager}
 import org.apache.kafka.server.FetchSession.FetchSessionCache
@@ -81,7 +81,8 @@ import scala.jdk.OptionConverters.RichOption
  * A Kafka broker that runs in KRaft (Kafka Raft) mode.
  */
 class BrokerServer(
-  val sharedServer: SharedServer
+  val sharedServer: SharedServer,
+  val configSchema: KafkaConfigSchema = KafkaRaftServer.configSchema
 ) extends KafkaBroker {
   val config: KafkaConfig = sharedServer.brokerConfig
   val time: Time = sharedServer.time
@@ -513,7 +514,8 @@ class BrokerServer(
         tokenManager = tokenManager,
         apiVersionManager = apiVersionManager,
         clientMetricsManager = clientMetricsManager,
-        groupConfigManager = groupConfigManager)
+        groupConfigManager = groupConfigManager,
+        configSchema = configSchema)
 
       dataPlaneRequestHandlerPool = sharedServer.requestHandlerPoolFactory.createPool(
         config.nodeId,

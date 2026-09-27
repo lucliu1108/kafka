@@ -21,6 +21,7 @@ import kafka.coordinator.transaction.TransactionCoordinator;
 import kafka.network.RequestChannel;
 import kafka.server.KafkaApis;
 import kafka.server.KafkaConfig;
+import kafka.server.KafkaRaftServer;
 import kafka.server.ReplicaManager;
 import kafka.server.share.SharePartitionManager;
 
@@ -31,6 +32,7 @@ import org.apache.kafka.coordinator.group.GroupConfigManager;
 import org.apache.kafka.coordinator.group.GroupCoordinator;
 import org.apache.kafka.coordinator.share.ShareCoordinator;
 import org.apache.kafka.metadata.ConfigRepository;
+import org.apache.kafka.metadata.KafkaConfigSchema;
 import org.apache.kafka.metadata.MetadataCache;
 import org.apache.kafka.security.DelegationTokenManager;
 import org.apache.kafka.server.ApiVersionManager;
@@ -71,6 +73,7 @@ public class KafkaApisBuilder {
     private ClientMetricsManager clientMetricsManager = null;
     private ShareCoordinator shareCoordinator = null;
     private GroupConfigManager groupConfigManager = null;
+    private KafkaConfigSchema configSchema = KafkaRaftServer.configSchema();
 
     public KafkaApisBuilder setRequestChannel(RequestChannel requestChannel) {
         this.requestChannel = requestChannel;
@@ -187,6 +190,11 @@ public class KafkaApisBuilder {
         return this;
     }
 
+    public KafkaApisBuilder setConfigSchema(KafkaConfigSchema configSchema) {
+        this.configSchema = configSchema;
+        return this;
+    }
+
     @SuppressWarnings({"CyclomaticComplexity"})
     public KafkaApis build() {
         if (requestChannel == null) throw new RuntimeException("you must set requestChannel");
@@ -230,6 +238,7 @@ public class KafkaApisBuilder {
                              tokenManager,
                              apiVersionManager,
                              clientMetricsManager,
-                             groupConfigManager);
+                             groupConfigManager,
+                             configSchema);
     }
 }

@@ -294,7 +294,8 @@ class ControllerServer(
         clusterId,
         registrationsPublisher,
         apiVersionManager,
-        metadataCache)
+        metadataCache,
+        configSchema)
       controllerApisHandlerPool = sharedServer.requestHandlerPoolFactory.createPool(
         config.nodeId,
         socketServer.dataPlaneRequestChannel,
