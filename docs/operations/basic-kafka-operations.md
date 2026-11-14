@@ -113,6 +113,8 @@ controlled.shutdown.enable=true
 
 Note that controlled shutdown will only succeed if _all_ the partitions hosted on the broker have replicas (i.e. the replication factor is greater than 1 _and_ at least one of these replicas is alive). This is generally what you want since shutting down the last replica would make that topic partition unavailable. 
 
+Note that moving leadership does not wait for followers to catch up with the leader. If a producer uses `acks=1`, records that the old leader acknowledged but had not yet replicated to the new leader may be lost when leadership moves. The same applies to other planned leadership changes, such as preferred leader election and partition reassignment that removes the current leader. Producers that need these records to survive leadership changes should use `acks=all`.
+
 ## Balancing leadership
 
 Whenever a broker stops or crashes, leadership for that broker's partitions transfers to other replicas. When the broker is restarted it will only be a follower for all its partitions, meaning it will not be used for client reads and writes. 
